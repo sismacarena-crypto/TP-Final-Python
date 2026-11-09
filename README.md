@@ -1,91 +1,84 @@
-# Trabajo Práctico Final — Python
+# Trabajo Práctico Final de Python
 
-Proyecto organizado en tres carpetas, una por ejercicio.
+Este es mi trabajo práctico final. Está dividido en tres carpetas, una para cada ejercicio.
+
+Para correr los ejercicios hay que tener Python instalado. Todos los comandos se escriben en la terminal, parada en la carpeta principal del proyecto.
+
+## Ejercicio 1: Sensores
+
+En este ejercicio trabajé con datos de sensores de temperatura que venían "sucios", por ejemplo con espacios de más o con la temperatura escrita como texto ("24.5C" o "31.2°C").
+
+Hice dos funciones:
+
+- `limpiar_registro_sensor`: saca los espacios del nombre del sensor, convierte la temperatura a número y, si el sensor no tiene ubicación, le pone "Desconocida".
+- `generar_resumen_sensores`: me dice qué sensores pasan la temperatura límite y calcula el promedio.
+
+Para ejecutarlo:
 
 ```
-TP-Final-Python/
-├── ejercicio_1/
-│   └── main.py                      # Sanitización de sensores
-├── ejercicio_2/
-│   ├── main.py                      # Inventario POO + JSON
-│   └── catalogo_ecotech.json        # Archivo generado por main.py
-└── ejercicio_3/
-    └── panel_sustentabilidad/       # Proyecto Django
-        ├── manage.py
-        ├── requirements.txt
-        ├── panel_sustentabilidad/   # Configuración (settings, urls, wsgi, asgi)
-        └── sustentabilidad/         # App: calculos.py, views.py, tests.py, templates/
-```
-
-## Requisitos
-
-- Python 3.10 o superior
-- Django 5.2 (solo para el Ejercicio 3)
-
-Todos los comandos se ejecutan desde la carpeta raíz del repositorio.
-En Windows puede usarse `py` en lugar de `python`.
-
-## Ejercicio 1 — Sanitización de sensores (20 puntos)
-
-```bash
 python ejercicio_1/main.py
 ```
 
-- `limpiar_registro_sensor`: quita espacios del identificador, convierte la temperatura
-  de texto (`"24.5C"`, `"31.2°C"`, `" 28.0 C "`) a número y asigna `"Desconocida"`
-  cuando falta la ubicación.
-- `generar_resumen_sensores`: devuelve la lista de sensores que superan el umbral y la
-  temperatura promedio.
+## Ejercicio 2: Inventario
 
-Salida esperada:
+Acá hice un pequeño inventario de productos ecológicos usando clases.
+
+- La clase `DispositivoEcologico` guarda el modelo, el precio y el stock. El stock es privado y solo se cambia con `set_stock`, que no deja poner un número negativo.
+- Si alguien intenta poner stock negativo, salta un error propio que llamé `StockInvalidoError`.
+- La clase `PanelSolar` hereda de `DispositivoEcologico` y le agrega la potencia en watts. También cambia cómo se muestra la ficha técnica.
+- `GestorInventario` guarda todos los productos en el archivo `catalogo_ecotech.json`.
+
+Para ejecutarlo:
 
 ```
-=== REPORTE DE SENSORES ===
-SENSOR-001 | 24.5 °C | Planta Norte
-SENSOR-002 | 31.2 °C | Desconocida
-SENSOR-003 | 28.0 °C | Planta Sur
-Sensores en alerta: SENSOR-002, SENSOR-003
-Temperatura promedio: 27.90 °C
-```
-
-## Ejercicio 2 — Inventario y JSON (40 puntos)
-
-```bash
 python ejercicio_2/main.py
 ```
 
-- **Encapsulamiento:** el stock es un atributo privado (`__stock`) con `get_stock` / `set_stock`.
-- **Excepción personalizada:** `StockInvalidoError` si el stock es negativo o no es entero.
-- **Herencia:** `PanelSolar` hereda de `DispositivoEcologico`.
-- **Polimorfismo:** `obtener_ficha_tecnica()` y `a_diccionario()` se redefinen en `PanelSolar`.
-- **Persistencia:** `GestorInventario.guardar_catalogo_json()` exporta el catálogo a
-  `ejercicio_2/catalogo_ecotech.json`.
+## Ejercicio 3: Pruebas y Django
 
-## Ejercicio 3 — Pruebas unitarias y Django (40 puntos)
+En este ejercicio hice funciones para calcular las emisiones de carbono a partir del consumo de energía, y les escribí pruebas para ver que funcionen bien (por ejemplo, que den error si el consumo es negativo).
 
-```bash
+Después armé un proyecto en Django con una página que muestra el total de emisiones y cuál es la planta que más consume. Los datos que usa son de ejemplo, no son mediciones reales.
+
+### Cómo ejecutarlo
+
+1. Entrar a la carpeta del proyecto:
+
+```
 cd ejercicio_3/panel_sustentabilidad
+```
+
+2. Instalar Django (solo la primera vez):
+
+```
 python -m pip install -r requirements.txt
-python manage.py test        # ejecuta las 6 pruebas unitarias
-python manage.py migrate     # opcional: crea la base local y evita el aviso de migraciones
+```
+
+3. Correr las pruebas:
+
+```
+python manage.py test
+```
+
+Si todo está bien, al final aparece `OK`.
+
+4. Prender el servidor:
+
+```
 python manage.py runserver
 ```
 
-Luego abrir <http://127.0.0.1:8000/> en el navegador para ver el panel con las emisiones
-totales de CO₂ y la planta de mayor consumo.
+5. Abrir en el navegador la dirección `http://127.0.0.1:8000/` para ver la página.
 
-- `sustentabilidad/calculos.py`: lógica de negocio (`calcular_emisiones_carbono`,
-  `obtener_metricas_consumo`), independiente de Django.
-- `sustentabilidad/tests.py`: pruebas del cálculo nominal, factor personalizado, consumo
-  cero, consumo negativo (`ValueError`), métricas por planta y respuesta de la vista web.
-- `sustentabilidad/views.py` y `templates/sustentabilidad/panel.html`: vista y plantilla
-  del panel.
+Para apagar el servidor se aprieta `Ctrl + C` en la terminal.
 
-Resultado de las pruebas:
+Puede aparecer un aviso de "migraciones sin aplicar". No afecta a la página, pero si se quiere sacar se puede correr `python manage.py migrate`.
 
-```
-Ran 6 tests ... OK
-```
+## Qué practiqué en este trabajo
 
-**Nota:** los registros del panel son datos de ejemplo, no mediciones reales. La clave
-secreta y `DEBUG = True` son solo para desarrollo local.
+- Limpiar datos que vienen escritos de distintas formas y pasarlos a número.
+- Usar clases, herencia y atributos privados.
+- Crear mi propio tipo de error y atraparlo con `try` / `except`.
+- Guardar información en un archivo JSON.
+- Escribir pruebas para comprobar que mis funciones den el resultado correcto.
+- Armar un proyecto en Django con una vista y una plantilla HTML.
